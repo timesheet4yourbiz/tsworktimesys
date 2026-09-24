@@ -11,31 +11,7 @@ export async function loadSidebar() {
         document.body.classList.add('sidebar-collapsed');
     }
 
-    // --- RBAC: AMBIL DATA PENGGUNA DARI SUPABASE ---
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    const email = session.user.email;
-
-    const { data: emp } = await supabase
-        .from('employees')
-        .select('name, system_role')
-        .eq('email', email)
-        .maybeSingle();
-
-    const roleText = (emp && emp.system_role) ? emp.system_role.toLowerCase() : 'employee';
-    const isAdmin = roleText === 'admin';
-
-    // Sembunyikan menu 'EMPLOYEES' sepenuhnya jika BUKAN Admin
-    const employeesMenuHTML = isAdmin ? `
-                <a href="employees.html" class="nav-item ${currentPath.includes('employees.html') ? 'active' : ''}" title="TEAM / EMPLOYEES">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    <div class="nav-item-text hide-on-collapse">
-                        <span class="nav-item-title">Team / Employees</span>
-                        <span class="nav-item-subtitle">Member & Roles</span>
-                    </div>
-                </a>
-    ` : '';
-
+    // 1. LUKIS SIDEBAR SERTA-MERTA (SUPAYA SENTIASA MUNCUL)
     const sidebarHTML = `
         <aside class="sidebar">
             <div class="sidebar-header" style="display:flex; justify-content:space-between; align-items:center;">
@@ -110,7 +86,8 @@ export async function loadSidebar() {
                     </div>
                 </a>
 
-                ${employeesMenuHTML}
+                <!-- Ruang untuk Menu Employees Admin -->
+                <div id="adminEmployeesMenuItem"></div>
 
                 <div class="nav-section-title hide-on-collapse">APPROVAL & ATTENDANCE</div>
                 <a href="attendance.html" class="nav-item ${currentPath.includes('attendance.html') ? 'active' : ''}" title="ATTENDANCE">
@@ -156,6 +133,7 @@ export async function loadSidebar() {
 
     container.innerHTML = sidebarHTML;
 
+    // BIND TOGGLE & LOGOUT
     const toggleBtn = document.getElementById('toggleSidebarBtn');
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
@@ -172,5 +150,37 @@ export async function loadSidebar() {
         });
     }
 
-    window.currentUserIsAdmin = isAdmin;
+    // 2. SEMAK SUPABASE SESSION DIBELAKANG TABIR (ASYNC)
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            const email = session.user.email;
+            const { data: emp } = await supabase
+                .from('employees')
+                .select('name, system_role')
+                .eq('email', email)
+                .maybeSingle();
+
+            const roleText = (emp && emp.system_role) ? emp.system_role.toLowerCase() : 'employee';
+            const isAdmin = roleText === 'admin';
+
+            if (isAdmin) {
+                const empMenuItem = document.getElementById('adminEmployeesMenuItem');
+                if (empMenuItem) {
+                    empMenuItem.innerHTML = `
+                        <a href="employees.html" class="nav-item ${currentPath.includes('employees.html') ? 'active' : ''}" title="TEAM / EMPLOYEES">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <div class="nav-item-text hide-on-collapse">
+                                <span class="nav-item-title">Team / Employees</span>
+                                <span class="nav-item-subtitle">Member & Roles</span>
+                            </div>
+                        </a>
+                    `;
+                }
+            }
+            window.currentUserIsAdmin = isAdmin;
+        }
+    } catch (err) {
+        console.error("Sidebar Auth Check Error:", err);
+    }
 }
