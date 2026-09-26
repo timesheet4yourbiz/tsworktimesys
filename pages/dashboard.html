@@ -1,244 +1,135 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
-    <meta name="google-site-verification" content="n2mUY-DGxJy3oDnioVYgZ74NSFGoJhcCarz6kC9U9JA" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - CRANETRACK</title>
-    <!-- CSS Utama -->
+    <title>CRANETRACK — Dashboard</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/topnav.css">
+    <link rel="stylesheet" href="../css/cranetrack_dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="main-content">
-        <!-- TOP HEADER PREMIUM V2 -->
-        <div class="top-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;">
-            <div>
-                <h1 style="margin: 0; font-size: 1.4rem; color: #0f172a; font-weight: 800; letter-spacing: -0.5px;">Overview & Insights</h1>
+    <!-- Required by dashboard.js: the navigation is rendered here, but is no longer a sidebar. -->
+    <div id="sidebar-container"></div>
+
+    <main class="main-content cranetrack-page">
+        <header class="ct-topbar">
+            <div class="ct-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                <input id="globalSearch" type="search" placeholder="Search project, member, client, or task..." aria-label="Search">
             </div>
-            
-            <div style="display: flex; align-items: center; gap: 24px;">
-                <!-- NOTIFICATION BELL -->
-                <div class="notification-wrapper" style="position: relative; display: inline-block;">
-                    <button id="notifBellBtn" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 50%; cursor: pointer; position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #64748b; transition: all 0.2s;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                        <span id="notifBadge" style="display: none; position: absolute; top: -2px; right: -2px; background: #ef4444; color: white; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 10px; line-height: 1; border: 2px solid white;">0</span>
+
+            <div class="ct-top-actions">
+                <div class="ct-date-pill">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+                    <button id="prevDashBtn" class="ct-date-arrow" aria-label="Previous week">‹</button>
+                    <span id="dashDateRangeText">Loading...</span>
+                    <button id="nextDashBtn" class="ct-date-arrow" aria-label="Next week">›</button>
+                </div>
+
+                <div class="ct-notification-wrap">
+                    <button id="notifBellBtn" class="ct-icon-btn" aria-label="Notifications">
+                        <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <span id="notifBadge" class="ct-notif-badge" style="display:none">0</span>
                     </button>
-
-                    <!-- Popup Dropdown Notifikasi -->
-                    <div id="notifDropdown" style="display: none; position: absolute; right: 0; top: 110%; width: 320px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); z-index: 9999; overflow: hidden;">
-                        <div style="padding: 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
-                            <span style="font-weight: 700; font-size: 0.9rem; color: #0f172a;">Notifications</span>
-                            <button id="markAllReadBtn" style="background: none; border: none; font-size: 0.75rem; color: #0ea5e9; cursor: pointer; font-weight: 600;">Mark all read</button>
-                        </div>
-                        <div id="notifList" style="max-height: 300px; overflow-y: auto;">
-                            <div style="padding: 24px; text-align: center; color: #94a3b8; font-size: 0.85rem;">Loading notifications...</div>
-                        </div>
+                    <div id="notifDropdown" class="ct-notif-dropdown" style="display:none">
+                        <div class="ct-notif-head"><strong>Notifications</strong><button id="markAllReadBtn">Mark all read</button></div>
+                        <div id="notifList"><div class="ct-empty">Loading notifications...</div></div>
                     </div>
                 </div>
-                
-                <!-- Profil Pengguna Header -->
-                <div style="display: flex; align-items: center; gap: 12px; border-left: 1px solid #e2e8f0; padding-left: 24px;">
-                    <div class="avatar" style="width: 40px; height: 40px; border-radius: 50%; background: #0ea5e9; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem;">M</div>
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 0.85rem; font-weight: 700; color: #0f172a; text-transform: uppercase;">My Account</span>
-                        <span style="font-size: 0.7rem; color: #10b981; font-weight: 600;">● Online</span>
+
+                <div class="ct-profile-wrap">
+                    <button id="profileMenuBtn" class="ct-profile-btn" aria-expanded="false">
+                        <span class="ct-avatar" id="headerAvatar">M</span>
+                        <span class="ct-profile-copy"><strong id="headerUserName">MOHAMAD</strong><small id="headerUserRole">Administrator</small></span>
+                        <svg class="ct-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
+                    </button>
+                    <div id="profileDropdown" class="ct-profile-dropdown" style="display:none">
+                        <a href="profile.html">My Profile</a>
+                        <a href="settings.html">Settings</a>
+                        <button id="logoutBtn">Log out</button>
                     </div>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <!-- WELCOME BANNER (Gaya Enterprise) -->
-        <div class="welcome-banner" style="background: linear-gradient(135deg, #0b1121 0%, #1e3a8a 100%); border-radius: 16px; padding: 36px 40px; color: white; margin-bottom: 28px; position: relative; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.25);">
-            <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 45%; background: url('https://images.unsplash.com/photo-1541888086225-ae81b373c651?auto=format&fit=crop&w=800&q=80') center/cover; opacity: 0.12; clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);"></div>
-            <div style="position: relative; z-index: 2;">
-                <div style="font-size: 0.75rem; font-weight: 800; letter-spacing: 0.2em; color: #38bdf8; margin-bottom: 10px;">WELCOME BACK</div>
-                <h2 style="margin: 0 0 8px 0; font-size: 2rem; font-weight: 800; letter-spacing: -0.5px;">Good Afternoon, Team</h2>
-                <p style="margin: 0; color: #93c5fd; font-size: 0.95rem; max-width: 520px; line-height: 1.5;">Track time. Manage projects. Deliver excellence. Here's what's happening with your team this week.</p>
+        <section class="ct-welcome">
+            <div class="ct-welcome-overlay"></div>
+            <div class="ct-welcome-content">
+                <div class="ct-eyebrow">WELCOME BACK</div>
+                <h1>Good Afternoon, <span id="welcomeUserName">Mohamad</span></h1>
+                <p>Track time. Deliver projects. Build a better tomorrow.</p>
+                <span class="ct-accent-line"></span>
             </div>
-        </div>
+            <div class="ct-welcome-right">
+                <div>PLAN</div><div>EXECUTE</div><div>MONITOR</div><div>ACHIEVE</div>
+                <span></span>
+            </div>
+        </section>
 
-        <!-- TOP NAVIGATION: rendered by sidebar.js; intentionally placed below banner -->
-        <div id="sidebar-container"></div>
+        <section class="ct-kpi-grid">
+            <article class="ct-kpi-card kpi-purple">
+                <div class="ct-kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></div>
+                <div class="ct-kpi-body"><small>TOTAL HOURS</small><strong id="kpiTotalTime">--:--</strong><span class="ct-kpi-trend positive">↗ +12%</span><em>vs. previous week</em></div>
+                <div class="ct-mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+            <article class="ct-kpi-card kpi-teal">
+                <div class="ct-kpi-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M8 8h8M8 12h5M8 16h6"></path></svg></div>
+                <div class="ct-kpi-body"><small>ACTIVE PROJECTS</small><strong id="kpiActiveProjects">--</strong><span class="ct-kpi-trend neutral">↗ +3</span><em>vs. previous week</em></div>
+                <div class="ct-mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+            <article class="ct-kpi-card kpi-orange">
+                <div class="ct-kpi-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.5"></circle><path d="M3 20a6 6 0 0 1 12 0M14 20a5 5 0 0 1 7 0"></path></svg></div>
+                <div class="ct-kpi-body"><small>TEAM MEMBERS</small><strong id="kpiTeamMembers">--</strong><span class="ct-kpi-trend neutral">↔ 0%</span><em>vs. previous week</em></div>
+                <div class="ct-mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+            <article class="ct-kpi-card kpi-pink">
+                <div class="ct-kpi-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16v14H4z"></path><path d="M8 6V4h8v2M8 11h8M8 15h5"></path></svg></div>
+                <div class="ct-kpi-body"><small>TOP CLIENT</small><strong id="kpiTopClient">--</strong><span class="ct-kpi-trend red">24.8%</span><em>of total hours</em></div>
+                <div class="ct-mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+        </section>
 
-        <!-- KPI CARDS GRID -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 24px;">
-            <!-- Card 1: Total Time -->
-            <div style="background: white; padding: 20px 24px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                <div style="width: 54px; height: 54px; border-radius: 14px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                </div>
-                <div style="overflow: hidden;">
-                    <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Total Time</div>
-                    <div id="kpiTotalTime" style="font-size: 1.7rem; font-weight: 800; color: #0f172a; line-height: 1.1;">--:--</div>
-                </div>
-            </div>
-            
-            <!-- Card 2: Top Project -->
-            <div style="background: white; padding: 20px 24px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                <div style="width: 54px; height: 54px; border-radius: 14px; background: #ecfdf5; color: #10b981; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                </div>
-                <div style="overflow: hidden;">
-                    <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Top Project</div>
-                    <div id="kpiTopProject" style="font-size: 1.2rem; font-weight: 800; color: #0f172a; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">--</div>
-                </div>
-            </div>
+        <section class="ct-filterbar">
+            <div class="ct-filter-control"><svg viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"></path></svg><select id="filterProject"><option value="all">All Projects</option></select></div>
+            <div class="ct-filter-control"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><path d="M3 20a6 6 0 0 1 12 0M16 11a3 3 0 1 0 0-6M16 14a5 5 0 0 1 5 6"></path></svg><select id="filterTeam"><option value="all">All Teams</option></select></div>
+            <div class="ct-filter-spacer"></div>
+            <button class="ct-apply-filter" id="applyDashboardFilter"><svg viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"></path></svg> Apply Filter</button>
+        </section>
 
-            <!-- Card 3: Top Client -->
-            <div style="background: white; padding: 20px 24px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                <div style="width: 54px; height: 54px; border-radius: 14px; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                </div>
-                <div style="overflow: hidden;">
-                    <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Top Client</div>
-                    <div id="kpiTopClient" style="font-size: 1.2rem; font-weight: 800; color: #0f172a; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">--</div>
-                </div>
-            </div>
+        <section class="ct-grid-primary">
+            <article class="ct-panel ct-time-panel">
+                <div class="ct-panel-head"><div><div class="ct-panel-title"><span class="ct-title-icon blue"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"></path></svg></span><h2>Tracked Time by Day</h2></div><p>Total hours tracked across all projects and team members</p></div><div class="ct-chart-actions"><select><option>Stacked</option></select><select><option>Hours</option></select><button>•••</button></div></div>
+                <div class="ct-chart-box ct-bar-box"><canvas id="stackedBarChart"></canvas></div>
+            </article>
+            <article class="ct-panel ct-project-distribution">
+                <div class="ct-panel-head"><div class="ct-panel-title"><span class="ct-title-icon green"><svg viewBox="0 0 24 24"><path d="M5 19V9M12 19V4M19 19v-7"></path></svg></span><h2>Project Distribution</h2></div><button>•••</button></div>
+                <div class="ct-donut-wrap"><div class="ct-donut-box"><canvas id="donutChart"></canvas><div class="ct-donut-center"><strong id="donutTotal">--:--</strong><span>Total Hours</span></div></div><div id="projectDistributionLegend" class="ct-legend"></div></div>
+            </article>
+        </section>
 
-            <!-- Card 4: Team Indicator -->
-            <div style="background: white; padding: 20px 24px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                <div style="width: 54px; height: 54px; border-radius: 14px; background: #fff7ed; color: #ea580c; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                </div>
-                <div style="overflow: hidden;">
-                    <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Team Members</div>
-                    <div style="font-size: 1.7rem; font-weight: 800; color: #0f172a; line-height: 1.1;">Active</div>
-                </div>
-            </div>
-        </div>
+        <section class="ct-grid-secondary">
+            <article class="ct-panel ct-list-panel"><div class="ct-panel-head"><div class="ct-panel-title"><span class="ct-title-icon gold">🏆</span><h2>Top Projects</h2></div><a href="projects.html">View All →</a></div><div id="topProjectsList" class="ct-top-projects"><div class="ct-empty">Loading...</div></div></article>
+            <article class="ct-panel ct-list-panel"><div class="ct-panel-head"><div class="ct-panel-title"><span class="ct-title-icon green"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"></path></svg></span><h2>Team Performance</h2></div><a href="employees.html">View All →</a></div><div id="teamPerformanceList" class="ct-team-performance"><div class="ct-empty">Loading...</div></div></article>
+            <article class="ct-panel ct-list-panel"><div class="ct-panel-head"><div class="ct-panel-title"><span class="ct-title-icon blue">⚙</span><h2>Project Status</h2></div><button>•••</button></div><div class="ct-status-wrap"><div class="ct-status-donut"><canvas id="projectStatusChart"></canvas><div><strong id="projectStatusTotal">--</strong><span>Total Projects</span></div></div><div id="projectStatusLegend" class="ct-status-legend"></div></div></article>
+        </section>
 
-        <!-- FILTER BAR -->
-        <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 28px; flex-wrap: wrap; background: white; padding: 14px 24px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-            <div style="display: flex; align-items: center; gap: 8px; border-right: 1px solid #e2e8f0; padding-right: 16px;">
-                <svg width="18" height="18" fill="none" stroke="#64748b" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                <span style="font-size: 0.8rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Filters</span>
+        <section class="ct-team-panel">
+            <div class="ct-team-head">
+                <div class="ct-panel-title"><span class="ct-title-icon blue"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.5"></circle><path d="M2 20a6 6 0 0 1 12 0M14 20a5 5 0 0 1 8 0"></path></svg></span><div><h2>Recent Team Activities</h2><p>Live and historical activity of your team members</p></div></div>
+                <div class="ct-team-tools"><label class="ct-search-small"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="searchMemberInput" placeholder="Search member..."></label><select><option>All Status</option></select><select><option>All Projects</option></select><div class="ct-view-toggle"><button class="active">☷</button><button>▥</button><button>▦</button></div></div>
             </div>
-            
-            <select id="filterProject" style="padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: 8px; color: #0f172a; font-weight: 600; font-size: 0.85rem; outline: none; background: #f8fafc; cursor: pointer; min-width: 180px;">
-                <option value="ALL">All Projects</option>
-            </select>
-            
-            <select id="filterTeam" style="padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: 8px; color: #0f172a; font-weight: 600; font-size: 0.85rem; outline: none; background: #f8fafc; cursor: pointer; min-width: 180px;">
-                <option value="ALL">All Teams</option>
-            </select>
-            
-            <div style="display: flex; border: 1px solid #cbd5e1; border-radius: 8px; background: white; overflow: hidden; align-items: center; margin-left: auto;">
-                <button id="prevDashBtn" style="padding: 10px 16px; background: white; border: none; border-right: 1px solid #cbd5e1; cursor: pointer; color: #64748b; font-weight: bold;">&lt;</button>
-                <div style="padding: 10px 20px; border-right: 1px solid #cbd5e1; color: #0f172a; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    <span id="dashDateRangeText">Memuatkan...</span>
-                </div>
-                <button id="nextDashBtn" style="padding: 10px 16px; background: white; border: none; cursor: pointer; color: #64748b; font-weight: bold;">&gt;</button>
-            </div>
-        </div>
-
-        <!-- MAIN CHART (TIME BY DAY) -->
-        <div class="chart-card" style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-            <h3 class="chart-header" style="font-size: 0.85rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 16px; margin-top: 0; letter-spacing: 0.5px;">Time by Day</h3>
-            <div class="main-chart-container" style="height: 350px; width: 100%; position: relative;">
-                <canvas id="stackedBarChart"></canvas>
-            </div>
-        </div>
-
-        <!-- PROJECT DISTRIBUTION & RANKING -->
-        <div class="distribution-grid" style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; margin-bottom: 24px;">
-            <div class="chart-card" style="margin-bottom:0; background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                <h3 class="chart-header" style="font-size: 0.85rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 16px; margin-top: 0; letter-spacing: 0.5px;">Project Distribution</h3>
-                <div class="donut-container" style="height: 250px; position: relative; display: flex; justify-content: center; align-items: center;">
-                    <canvas id="donutChart"></canvas>
-                    <div class="donut-center-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;">
-                        <div class="donut-center-val" id="donutTotal" style="font-size: 1.3rem; font-weight: 800; color: #0f172a;">--:--</div>
-                        <div class="donut-center-lbl" style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Total</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chart-card" style="margin-bottom:0; background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                <h3 class="chart-header" style="font-size: 0.85rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 16px; margin-top: 0; letter-spacing: 0.5px;">Project Ranking</h3>
-                <div class="ranking-list" id="projectRankingList" style="max-height: 250px; overflow-y: auto; padding-right: 10px;">
-                    <div style="color:#94a3b8; text-align:center; padding: 20px;">Memuatkan...</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TEAM ACTIVITIES TABLE -->
-        <div class="glacier-card" style="margin-top: 0; padding: 0; overflow: hidden; border-radius: 12px; border: 1px solid #e2e8f0; background: white;">
-            <!-- Header Jadual -->
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; gap: 16px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="background: #eef2ff; padding: 10px; border-radius: 10px; display: flex;">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="#0ea5e9" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    </div>
-                    <div>
-                        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">Team Activities</h3>
-                        <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">Live and historical activity of your team members</div>
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <!-- Carian -->
-                    <div style="display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 12px; background: white; height: 38px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="searchMemberInput" placeholder="Search member.." style="border: none; outline: none; padding: 6px; font-size: 0.85rem; width: 140px;">
-                    </div>
-                    
-                    <select style="padding: 0 12px; height: 38px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; background: white; font-size: 0.85rem; color: #0f172a; font-weight: 600;">
-                        <option>All Status</option>
-                    </select>
-                    <select style="padding: 0 12px; height: 38px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; background: white; font-size: 0.85rem; color: #0f172a; font-weight: 600;">
-                        <option>All Projects</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Jadual -->
-            <div class="table-container">
-                <table class="team-table" style="min-width: 1200px; border-bottom: none;">
-                    <thead>
-                        <tr style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                            <th style="width: 40px; text-align: center;">#</th>
-                            <th>TEAM MEMBER</th>
-                            <th>LATEST ACTIVITY</th>
-                            <th>STATUS</th>
-                            <th style="text-align: center;">CURRENT TIMER</th>
-                            <th>TOTAL TRACKED<br><span style="font-weight: 500; font-size: 0.65rem;" id="tableDateRange">(DASHBOARD DATES)</span></th>
-                            <th style="width: 250px;">WEEKLY BREAKDOWN</th>
-                            <th style="text-align: center;">ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="teamActivitiesBody">
-                        <tr><td colspan="8" style="text-align:center; color:#94a3b8; padding: 24px;">Memuatkan rekod pekerja...</td></tr>
-                    </tbody>
+            <div class="table-container ct-table-wrap">
+                <table class="team-table ct-team-table">
+                    <thead><tr><th>#</th><th>TEAM MEMBER</th><th>LATEST ACTIVITY</th><th>PROJECT</th><th>TIME</th><th>STATUS</th><th>DATE & TIME</th><th>ACTIONS</th></tr></thead>
+                    <tbody id="teamActivitiesBody"><tr><td colspan="8" class="ct-empty">Loading team activity...</td></tr></tbody>
                 </table>
             </div>
+            <div class="ct-pagination"><div>Show <select id="recordsPerPage"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select> entries</div><div class="ct-page-buttons"><button id="btnPrev">‹</button><button id="currentPageDisplay">1</button><button id="btnNext">›</button></div></div>
+        </section>
 
-            <!-- Pagination Bawah -->
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b; background: #f8fafc;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span>Show</span>
-                    <select id="recordsPerPage" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; background: white; font-size: 0.85rem; color: #0f172a; font-weight: 600;">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
-                    <span>entries</span>
-                </div>
-                
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <button id="btnPrev" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; color: #64748b; cursor: pointer; font-weight: bold;">«</button>
-                    <button id="currentPageDisplay" style="padding: 6px 14px; border-radius: 6px; border: none; background: #0ea5e9; color: white; font-weight: 700;">1</button>
-                    <button id="btnNext" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; color: #64748b; cursor: pointer; font-weight: bold;">»</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Script Asal Dashboard (Wajib Kekal) -->
+        <input type="hidden" id="userEmail" value="">
+    </main>
     <script type="module" src="../js/dashboard.js"></script>
 </body>
 </html>
