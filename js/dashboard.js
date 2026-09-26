@@ -26,6 +26,23 @@ let currentSort = { column: 'member', isAsc: true };
 // UTILITI
 // ==========================================
 const colorPalette = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#f43f5e', '#14b8a6', '#84cc16'];
+
+// ==========================================
+// BRANDING / DASHBOARD BANNER
+// ==========================================
+const DEFAULT_DASHBOARD_BANNER = 'https://gevftxdqyrejnjovurjt.supabase.co/storage/v1/object/public/cranetrack-assets/dashboard/crane-banner.jpg';
+
+function applyDashboardBanner() {
+    const banner = document.getElementById('dashboardWelcomeBanner');
+    if (!banner) return;
+
+    const imageUrl = banner.dataset.bannerUrl || DEFAULT_DASHBOARD_BANNER;
+    banner.style.backgroundImage = `linear-gradient(90deg, rgba(5,18,48,0.88) 0%, rgba(12,42,92,0.68) 45%, rgba(7,32,74,0.20) 100%), url(\"${imageUrl}\")`;
+    banner.style.backgroundSize = 'cover';
+    banner.style.backgroundPosition = 'center';
+    banner.style.backgroundRepeat = 'no-repeat';
+}
+
 function getProjectColor(name) {
     let hash = 0;
     for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -53,6 +70,7 @@ function formatHMS(seconds) {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         loadSidebar();
+        applyDashboardBanner();
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return window.location.href = '../pages/login.html';
 
