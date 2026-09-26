@@ -1,6 +1,7 @@
 import { initNotificationBell } from './notifications.js';
 import { supabase } from './supabase.js';
 import { loadSidebar } from './sidebar.js';
+import { getBranding, applyBranding } from './branding.js';
 
 let filterState = {
     startDate: '',
@@ -108,7 +109,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         await loadProjectDropdown();
         await refreshDashboardData();
-        applyCranetrackBranding();
+        const branding = await getBranding();
+        applyBranding(branding);
+        applyCranetrackBranding(branding);
 
     } catch (error) {
         console.error("Dashboard Init Error:", error);
@@ -528,20 +531,21 @@ function renderTeamActivities() {
 // ==========================================
 // CRANETRACK BRANDING / SUPABASE STORAGE
 // ==========================================
-function applyCranetrackBranding() {
-    const bannerUrl = 'https://gevftxdqyrejnjovurjt.supabase.co/storage/v1/object/public/cranetrack-assets/dashboard/crane-banner.jpg';
+function applyCranetrackBranding(settings = {}) {
+    const bannerUrl = settings.dashboard_banner_url || 'https://gevftxdqyrejnjovurjt.supabase.co/storage/v1/object/public/cranetrack-assets/dashboard/crane-banner.jpg';
     const banner = document.querySelector('.ct-welcome');
     if (banner) {
         banner.style.setProperty('--ct-banner-image', `url("${bannerUrl}")`);
-        banner.style.backgroundImage = `linear-gradient(90deg, rgba(231,243,255,.84) 0%, rgba(205,229,251,.48) 38%, rgba(36,83,145,.16) 68%, rgba(5,31,71,.58) 100%), url("${bannerUrl}")`;
+        banner.style.backgroundImage = `linear-gradient(90deg, rgba(231,243,255,.80) 0%, rgba(205,229,251,.40) 38%, rgba(36,83,145,.12) 68%, rgba(5,31,71,.48) 100%), url("${bannerUrl}")`;
         banner.style.backgroundSize = 'cover';
         banner.style.backgroundPosition = 'center center';
         banner.style.backgroundRepeat = 'no-repeat';
     }
 
     const pageTitle = document.querySelector('title');
-    if (pageTitle) pageTitle.textContent = 'CRANETRACK — Dashboard';
+    if (pageTitle) pageTitle.textContent = `${settings.system_name || 'CRANETRACK'} — Dashboard`;
 }
+
 
 // ==========================================
 // PREMIUM DASHBOARD PRESENTATION LAYER
