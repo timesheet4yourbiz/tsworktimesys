@@ -7,6 +7,38 @@
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/cranetrack_dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style id="cranetrack-v4-1-banner-fix">
+        :root { --ct-banner-image: url("https://gevftxdqyrejnjovurjt.supabase.co/storage/v1/object/public/cranetrack-assets/dashboard/crane-banner.jpg"); }
+        .ct-welcome {
+            min-height: 142px !important;
+            height: 142px !important;
+            position: relative !important;
+            overflow: hidden !important;
+            border-radius: 10px !important;
+            background-image:
+                linear-gradient(90deg, rgba(231,243,255,.84) 0%, rgba(205,229,251,.48) 38%, rgba(36,83,145,.16) 68%, rgba(5,31,71,.58) 100%),
+                var(--ct-banner-image) !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            box-shadow: 0 10px 26px rgba(24,65,116,.12) !important;
+        }
+        .ct-welcome::before, .ct-welcome::after { display:none !important; content:none !important; }
+        .ct-welcome-overlay { display:none !important; }
+        .ct-welcome-content, .ct-welcome-right { position:relative !important; z-index:2 !important; }
+        .ct-welcome-content { max-width: 62% !important; }
+        .ct-welcome-right { text-shadow: 0 1px 8px rgba(0,0,0,.25); }
+        @media (max-width: 900px) {
+            .ct-welcome { height: 150px !important; min-height:150px !important; }
+            .ct-welcome-content { max-width: 78% !important; }
+        }
+        @media (max-width: 640px) {
+            .ct-welcome { height: 180px !important; min-height:180px !important; background-position: 58% center !important; }
+            .ct-welcome-content { max-width: 100% !important; }
+            .ct-welcome-right { display:none !important; }
+        }
+    </style>
+
 </head>
 <body>
     <!-- Required by dashboard.js: the navigation is rendered here, but is no longer a sidebar. -->
@@ -53,7 +85,7 @@
             </div>
         </header>
 
-        <section class="ct-welcome" id="dashboardWelcomeBanner" data-banner-url="https://gevftxdqyrejnjovurjt.supabase.co/storage/v1/object/public/cranetrack-assets/dashboard/crane-banner.jpg">
+        <section class="ct-welcome">
             <div class="ct-welcome-overlay"></div>
             <div class="ct-welcome-content">
                 <div class="ct-eyebrow">WELCOME BACK</div>
@@ -130,6 +162,6 @@
 
         <input type="hidden" id="userEmail" value="">
     </main>
-    <script type="module" src="../js/dashboard.js"></script>
+    <script type="module" src="../js/dashboard.js?v=4.1.0"></script>
 </body>
 </html>
