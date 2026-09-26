@@ -1,0 +1,60 @@
+import { supabase } from './supabase.js';
+import { loadSidebar } from './sidebar.js';
+import { getBranding, applyBranding, uploadBrandAsset, saveBranding } from './branding.js';
+
+let current = null;
+const $ = id => document.getElementById(id);
+const setText = (id, text) => { const el=$(id); if(el) el.textContent=text; };
+
+function fill(s){
+    current=s;
+    ['system_name','system_tagline','welcome_title','welcome_message','primary_color','accent_color'].forEach(k=>{if($(k)) $(k).value=s[k]||'';});
+    ['primary_color','accent_color'].forEach(k=>setText(k.replace('_color','_hex'),(s[k]||'').toUpperCase()));
+    if(s.logo_url){$('logo_preview').src=s.logo_url;setText('logo_url_text','Current logo');}
+    if(s.favicon_url){$('favicon_preview').src=s.favicon_url;setText('favicon_url_text','Current favicon');}
+    if(s.dashboard_banner_url){$('banner_preview').src=s.dashboard_banner_url;setText('banner_url_text','Current dashboard banner');}
+    if(s.login_background_url){$('login_preview').src=s.login_background_url;setText('login_url_text','Current login background');}
+}
+
+async function uploadIfSelected(inputId, folder, filename){
+    const file=$(inputId).files[0];
+    if(!file) return null;
+    setText('saveStatus',`Uploading ${filename}…`);
+    return await uploadBrandAsset(file, folder, filename);
+}
+
+$('primary_color').addEventListener('input',e=>setText('primary_hex',e.target.value.toUpperCase()));
+$('accent_color').addEventListener('input',e=>setText('accent_hex',e.target.value.toUpperCase()));
+$('resetBtn').addEventListener('click',()=>fill(current));
+$('saveBtn').addEventListener('click',async()=>{
+    const btn=$('saveBtn'); btn.disabled=true; setText('saveStatus','Saving…');
+    try{
+        const logo=await uploadIfSelected('logo_file','branding','logo');
+        const favicon=await uploadIfSelected('favicon_file','branding','favicon');
+        const banner=await uploadIfSelected('banner_file','dashboard','crane-banner');
+        const login=await uploadIfSelected('login_file','login','background');
+        const values={
+            system_name:$('system_name').value.trim(), system_tagline:$('system_tagline').value.trim(),
+            welcome_title:$('welcome_title').value.trim(), welcome_message:$('welcome_message').value.trim(),
+            primary_color:$('primary_color').value, accent_color:$('accent_color').value,
+            logo_url:logo||current.logo_url||'', favicon_url:favicon||current.favicon_url||'',
+            dashboard_banner_url:banner||current.dashboard_banner_url||'', login_background_url:login||current.login_background_url||''
+        };
+        current=await saveBranding(values); fill(current); applyBranding(current);
+        setText('saveStatus','Branding saved successfully.');
+    }catch(e){console.error(e);setText('saveStatus',e.message||'Save failed.');}
+    finally{btn.disabled=false;}
+});
+
+document.addEventListener('DOMContentLoaded',async()=>{
+    loadSidebar();
+    try{
+        const {data:{session}}=await supabase.auth.getSession();
+        if(!session) return location.href='../pages/login.html';
+        const {data:emp}=await supabase.from('employees').select('system_role').eq('email',session.user.email).maybeSingle();
+        if(!emp || String(emp.system_role||'').toLowerCase()!=='admin'){
+            document.body.innerHTML='<div style="font-family:Arial;padding:60px;text-align:center"><h2>Administrator access required</h2><p>This page is restricted to administrators.</p></div>'; return;
+        }
+        fill(await getBranding());
+    }catch(e){console.error(e);setText('status','Unable to load branding settings.');}
+});
