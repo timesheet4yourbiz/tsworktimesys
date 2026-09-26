@@ -11,6 +11,8 @@ let filterState = {
 
 let chartBar = null;
 let chartDonut = null;
+let chartProjectStatus = null;
+let projectCatalog = [];
 
 // ==========================================
 // STATE UNTUK PAGINATION & SORTING
@@ -129,6 +131,7 @@ function bindFilters() {
 
 async function loadProjectDropdown() {
     const { data: projs } = await supabase.from('projects').select('id, project_name').order('project_name');
+    projectCatalog = projs || [];
     const select = document.getElementById('filterProject');
     if (projs && select) {
         projs.forEach(p => select.innerHTML += `<option value="${p.id}">${p.project_name}</option>`);
@@ -173,6 +176,7 @@ async function refreshDashboardData() {
     processDonutAndRanking(entries);
     
     teamDataList = processTeamActivitiesData(entries, employees);
+    renderPremiumDashboard(entries, employees);
     
     currentPage = 1;
     applySortingAndRender();
@@ -516,6 +520,69 @@ function renderTeamActivities() {
             </tr>
         `;
     });
+}
+
+
+
+// ==========================================
+// PREMIUM DASHBOARD PRESENTATION LAYER
+// ==========================================
+function renderPremiumDashboard(entries, employees) {
+    const stopped = (entries || []).filter(e => e.status === 'STOPPED');
+    const projectTotals = {};
+    stopped.forEach(e => {
+        const p = e.project?.project_name || 'No Project';
+        projectTotals[p] = (projectTotals[p] || 0) + (e.duration_seconds || 0);
+    });
+    const sortedProjects = Object.entries(projectTotals).sort((a,b)=>b[1]-a[1]);
+
+    const activeProjectsEl = document.getElementById('kpiActiveProjects');
+    if (activeProjectsEl) activeProjectsEl.textContent = projectCatalog.length || new Set(stopped.map(e=>e.project_id)).size || 0;
+    const teamEl = document.getElementById('kpiTeamMembers');
+    if (teamEl) teamEl.textContent = employees.length || 0;
+
+    // Client data is not part of the existing dashboard query, so do not invent a client name.
+    const clientEl = document.getElementById('kpiTopClient');
+    if (clientEl && clientEl.textContent === '--') clientEl.textContent = '—';
+
+    const topProjects = document.getElementById('topProjectsList');
+    if (topProjects) {
+        const max = sortedProjects[0]?.[1] || 1;
+        topProjects.innerHTML = sortedProjects.slice(0,5).map((item,idx)=>{
+            const [name,sec] = item;
+            const pct = Math.max(4,(sec/max)*100);
+            const color = getProjectColor(name);
+            const share = stopped.reduce((a,e)=>a+(e.duration_seconds||0),0) ? ((sec/stopped.reduce((a,e)=>a+(e.duration_seconds||0),0))*100).toFixed(1) : '0.0';
+            return `<div class="ct-project-row"><span class="ct-rank">${idx+1}</span><div class="ct-project-info"><strong>${name}</strong><div class="ct-progress"><i style="width:${pct}%;background:${color}"></i></div></div><span class="ct-project-time">${formatHMS(sec)}</span><span class="ct-project-pct">${share}%</span></div>`;
+        }).join('') || '<div class="ct-empty">No tracked project data</div>';
+    }
+
+    const teamList = (typeof teamDataList !== 'undefined' ? teamDataList : []).slice().sort((a,b)=>b.totalSec-a.totalSec).slice(0,5);
+    const teamPanel = document.getElementById('teamPerformanceList');
+    if (teamPanel) {
+        const maxTeam = teamList[0]?.totalSec || 1;
+        teamPanel.innerHTML = teamList.map(m=>{
+            const pct = Math.max(4,(m.totalSec/maxTeam)*100);
+            const color = getProjectColor(m.name);
+            return `<div class="ct-member-row"><span class="ct-member-avatar" style="background:${color}">${getInitials(m.name)}</span><div class="ct-member-info"><strong>${m.name}</strong><div class="ct-member-progress"><i style="width:${pct}%;background:${color}"></i></div></div><span class="ct-member-time">${formatHMS(m.totalSec)}</span></div>`;
+        }).join('') || '<div class="ct-empty">No team activity</div>';
+    }
+
+    const statusTotal = document.getElementById('projectStatusTotal');
+    if (statusTotal) statusTotal.textContent = projectCatalog.length || sortedProjects.length;
+    const trackedCount = new Set(stopped.map(e=>e.project_id).filter(Boolean)).size;
+    const totalCount = projectCatalog.length || sortedProjects.length;
+    const noActivity = Math.max(0,totalCount-trackedCount);
+    const statusLegend = document.getElementById('projectStatusLegend');
+    if (statusLegend) statusLegend.innerHTML = `<div class="ct-status-row"><b style="background:#18cf6d"></b><span>Tracked</span><span>${trackedCount}</span></div><div class="ct-status-row"><b style="background:#f6a21a"></b><span>No Activity</span><span>${noActivity}</span></div>`;
+    const statusCanvas = document.getElementById('projectStatusChart');
+    if (statusCanvas) {
+        if (chartProjectStatus) chartProjectStatus.destroy();
+        chartProjectStatus = new Chart(statusCanvas,{type:'doughnut',data:{labels:['Tracked','No Activity'],datasets:[{data:[trackedCount,noActivity],backgroundColor:['#18cf6d','#f6a21a'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false}}}});
+    }
+
+    const legend = document.getElementById('projectDistributionLegend');
+    if (legend) legend.innerHTML = sortedProjects.slice(0,7).map(([name,sec])=>{ const pct=stopped.reduce((a,e)=>a+(e.duration_seconds||0),0)?((sec/stopped.reduce((a,e)=>a+(e.duration_seconds||0),0))*100).toFixed(1):'0.0'; return `<div class="ct-legend-row"><b style="background:${getProjectColor(name)}"></b><span>${name}</span><span>${formatHMS(sec)}</span><span>${pct}%</span></div>`; }).join('') || '<div class="ct-empty">No data</div>';
 }
 
 // ==========================================
