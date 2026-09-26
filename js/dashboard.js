@@ -21,7 +21,7 @@ let recordsPerPage = 20;
 let currentSort = { column: 'member', isAsc: true };
 
 // ==========================================
-// UTILITI
+// UTILITI & WARNA V2
 // ==========================================
 const colorPalette = ['#0ea5e9', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#f43f5e', '#14b8a6', '#6366f1'];
 function getProjectColor(name) {
@@ -51,7 +51,10 @@ function formatHMS(seconds) {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         loadSidebar();
+        
+        // PENTING: Jangan buang baris ini untuk loceng V2 berfungsi
         initNotificationBell();
+
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return window.location.href = '../pages/login.html';
 
