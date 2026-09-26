@@ -26,23 +26,6 @@ let currentSort = { column: 'member', isAsc: true };
 // UTILITI
 // ==========================================
 const colorPalette = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#f43f5e', '#14b8a6', '#84cc16'];
-
-// ==========================================
-// BRANDING / DASHBOARD BANNER
-// ==========================================
-const DEFAULT_DASHBOARD_BANNER = 'https://gevftxdqyrejnjovurjt.supabase.co/storage/v1/object/public/cranetrack-assets/dashboard/crane-banner.jpg';
-
-function applyDashboardBanner() {
-    const banner = document.getElementById('dashboardWelcomeBanner');
-    if (!banner) return;
-
-    const imageUrl = banner.dataset.bannerUrl || DEFAULT_DASHBOARD_BANNER;
-    banner.style.backgroundImage = `linear-gradient(90deg, rgba(5,18,48,0.88) 0%, rgba(12,42,92,0.68) 45%, rgba(7,32,74,0.20) 100%), url(\"${imageUrl}\")`;
-    banner.style.backgroundSize = 'cover';
-    banner.style.backgroundPosition = 'center';
-    banner.style.backgroundRepeat = 'no-repeat';
-}
-
 function getProjectColor(name) {
     let hash = 0;
     for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -70,7 +53,6 @@ function formatHMS(seconds) {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         loadSidebar();
-        applyDashboardBanner();
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return window.location.href = '../pages/login.html';
 
@@ -126,6 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         await loadProjectDropdown();
         await refreshDashboardData();
+        applyCranetrackBranding();
 
     } catch (error) {
         console.error("Dashboard Init Error:", error);
@@ -543,6 +526,24 @@ function renderTeamActivities() {
 
 
 // ==========================================
+// CRANETRACK BRANDING / SUPABASE STORAGE
+// ==========================================
+function applyCranetrackBranding() {
+    const bannerUrl = 'https://gevftxdqyrejnjovurjt.supabase.co/storage/v1/object/public/cranetrack-assets/dashboard/crane-banner.jpg';
+    const banner = document.querySelector('.ct-welcome');
+    if (banner) {
+        banner.style.setProperty('--ct-banner-image', `url("${bannerUrl}")`);
+        banner.style.backgroundImage = `linear-gradient(90deg, rgba(231,243,255,.84) 0%, rgba(205,229,251,.48) 38%, rgba(36,83,145,.16) 68%, rgba(5,31,71,.58) 100%), url("${bannerUrl}")`;
+        banner.style.backgroundSize = 'cover';
+        banner.style.backgroundPosition = 'center center';
+        banner.style.backgroundRepeat = 'no-repeat';
+    }
+
+    const pageTitle = document.querySelector('title');
+    if (pageTitle) pageTitle.textContent = 'CRANETRACK — Dashboard';
+}
+
+// ==========================================
 // PREMIUM DASHBOARD PRESENTATION LAYER
 // ==========================================
 function renderPremiumDashboard(entries, employees) {
@@ -554,10 +555,14 @@ function renderPremiumDashboard(entries, employees) {
     });
     const sortedProjects = Object.entries(projectTotals).sort((a,b)=>b[1]-a[1]);
 
+    const trackedProjectIds = new Set(stopped.map(e => e.project_id).filter(Boolean));
+    const activeProjectCount = projectCatalog.length > 0 ? projectCatalog.length : trackedProjectIds.size;
     const activeProjectsEl = document.getElementById('kpiActiveProjects');
-    if (activeProjectsEl) activeProjectsEl.textContent = projectCatalog.length || new Set(stopped.map(e=>e.project_id)).size || 0;
+    if (activeProjectsEl) activeProjectsEl.textContent = String(activeProjectCount);
+
+    const teamMemberCount = Array.isArray(employees) ? employees.length : 0;
     const teamEl = document.getElementById('kpiTeamMembers');
-    if (teamEl) teamEl.textContent = employees.length || 0;
+    if (teamEl) teamEl.textContent = String(teamMemberCount);
 
     // Client data is not part of the existing dashboard query, so do not invent a client name.
     const clientEl = document.getElementById('kpiTopClient');
@@ -588,7 +593,7 @@ function renderPremiumDashboard(entries, employees) {
 
     const statusTotal = document.getElementById('projectStatusTotal');
     if (statusTotal) statusTotal.textContent = projectCatalog.length || sortedProjects.length;
-    const trackedCount = new Set(stopped.map(e=>e.project_id).filter(Boolean)).size;
+    const trackedCount = trackedProjectIds.size;
     const totalCount = projectCatalog.length || sortedProjects.length;
     const noActivity = Math.max(0,totalCount-trackedCount);
     const statusLegend = document.getElementById('projectStatusLegend');
