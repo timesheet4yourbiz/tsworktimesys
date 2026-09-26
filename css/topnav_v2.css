@@ -1,0 +1,259 @@
+/* =========================================================
+   CRANETRACK — TOP NAVIGATION PREMIUM V2
+   UI-only override. Existing business logic remains untouched.
+========================================================= */
+:root {
+  --ct-navy: #081426;
+  --ct-navy-2: #102544;
+  --ct-blue: #1677ff;
+  --ct-cyan: #12b8ff;
+  --ct-bg: #f5f8fc;
+  --ct-surface: #ffffff;
+  --ct-border: #e4eaf2;
+  --ct-text: #122033;
+  --ct-muted: #718096;
+  --ct-shadow: 0 12px 32px rgba(15, 35, 65, .07);
+}
+
+html, body { min-height: 100%; }
+body {
+  background: var(--ct-bg) !important;
+  color: var(--ct-text) !important;
+}
+
+/* Kill the old left-sidebar geometry without touching its JS API. */
+#sidebar-container {
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  z-index: 20 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  margin: 0 0 24px !important;
+}
+
+.main-content {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  padding: 26px clamp(18px, 3vw, 48px) 48px !important;
+  margin: 0 !important;
+  background: var(--ct-bg) !important;
+  overflow: visible !important;
+}
+
+/* Header */
+.top-header {
+  min-height: 62px !important;
+  margin-bottom: 18px !important;
+  padding: 0 2px 14px !important;
+  border-bottom: 1px solid var(--ct-border) !important;
+}
+.top-header h1 {
+  font-size: 1.55rem !important;
+  letter-spacing: -.04em !important;
+}
+.top-header::before {
+  content: 'CRANETRACK';
+  position: absolute;
+  left: clamp(18px, 3vw, 48px);
+  top: 28px;
+  transform: translateY(-50%);
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+  color: var(--ct-navy);
+  pointer-events: none;
+}
+.top-header > div:first-child { margin-left: 170px !important; }
+
+/* Premium welcome banner */
+.welcome-banner {
+  min-height: 168px !important;
+  padding: 34px 40px !important;
+  margin-bottom: 20px !important;
+  border-radius: 22px !important;
+  background: linear-gradient(115deg, #071427 0%, #102a55 55%, #1d4ed8 100%) !important;
+  box-shadow: 0 18px 40px rgba(12, 43, 92, .16) !important;
+  overflow: hidden !important;
+}
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  right: -80px;
+  top: -100px;
+  width: 430px;
+  height: 430px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 50%;
+  box-shadow: 0 0 0 36px rgba(255,255,255,.035), 0 0 0 72px rgba(255,255,255,.025);
+}
+.welcome-banner h2 { font-size: clamp(1.8rem, 3vw, 2.45rem) !important; }
+.welcome-banner p { max-width: 620px !important; }
+
+/* Top navigation */
+.top-navigation-shell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 70px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,.96);
+  border: 1px solid var(--ct-border);
+  border-radius: 18px;
+  box-shadow: var(--ct-shadow);
+  overflow: hidden;
+}
+.top-navigation-brand {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 14px 0 8px;
+  border-right: 1px solid var(--ct-border);
+}
+.topnav-brand-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: linear-gradient(135deg, var(--ct-blue), var(--ct-cyan));
+  border-radius: 11px;
+  box-shadow: 0 7px 16px rgba(22,119,255,.22);
+}
+.top-navigation-brand strong {
+  display: block;
+  color: var(--ct-navy);
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+.top-navigation-brand span {
+  display: block;
+  margin-top: 2px;
+  color: #91a0b5;
+  font-size: .55rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.topnav-menu {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.topnav-menu::-webkit-scrollbar { display: none; }
+.topnav-item {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 46px;
+  padding: 0 12px;
+  border-radius: 11px;
+  color: #627187 !important;
+  text-decoration: none !important;
+  font-size: .76rem;
+  font-weight: 750;
+  white-space: nowrap;
+  transition: .18s ease;
+}
+.topnav-item:hover {
+  color: var(--ct-blue) !important;
+  background: #f1f6ff;
+  transform: translateY(-1px);
+}
+.topnav-item.active {
+  color: white !important;
+  background: linear-gradient(135deg, #1677ff, #0b61df);
+  box-shadow: 0 8px 18px rgba(22,119,255,.22);
+}
+.topnav-icon { flex: 0 0 auto; }
+.topnav-divider {
+  width: 1px;
+  height: 28px;
+  flex: 0 0 auto;
+  background: var(--ct-border);
+  margin: 0 3px;
+}
+.topnav-account-actions { flex: 0 0 auto; margin-left: auto; }
+.topnav-logout {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ct-border);
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #68788f;
+  cursor: pointer;
+  transition: .18s ease;
+}
+.topnav-logout:hover { color: #dc2626; background: #fff5f5; border-color: #fecaca; }
+
+/* Dashboard content: give it breathing room and consistent surfaces. */
+.main-content > div:not(.top-header):not(.welcome-banner):not(#sidebar-container) {
+  max-width: 1680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.main-content .glacier-card,
+.main-content .chart-card,
+.main-content .card {
+  border-radius: 18px !important;
+  border-color: var(--ct-border) !important;
+  box-shadow: 0 8px 24px rgba(15,35,65,.045) !important;
+}
+
+/* Better filter/card controls without changing IDs or logic. */
+.main-content select,
+.main-content input {
+  border-color: #dbe3ee !important;
+  background: #fff !important;
+}
+.main-content select:focus,
+.main-content input:focus {
+  border-color: #7ab5ff !important;
+  box-shadow: 0 0 0 3px rgba(22,119,255,.10) !important;
+}
+
+/* Keep the dashboard chart responsive. */
+.main-chart-container { min-height: 300px; }
+
+/* Mobile */
+@media (max-width: 1100px) {
+  .top-navigation-brand { display: none; }
+  .topnav-menu { width: 100%; }
+  .top-navigation-shell { padding: 8px; }
+}
+
+@media (max-width: 720px) {
+  .main-content { padding: 14px 12px 30px !important; }
+  .top-header { min-height: 54px !important; }
+  .top-header::before { left: 12px; top: 25px; font-size: .68rem; }
+  .top-header > div:first-child { margin-left: 112px !important; }
+  .top-header h1 { font-size: 1.1rem !important; }
+  .welcome-banner { padding: 26px 24px !important; min-height: 145px !important; border-radius: 17px !important; }
+  .welcome-banner h2 { font-size: 1.55rem !important; }
+  .welcome-banner p { font-size: .82rem !important; }
+  .top-navigation-shell { border-radius: 14px; min-height: 58px; }
+  .topnav-item { min-height: 42px; padding: 0 10px; font-size: .7rem; }
+  .topnav-item span { display: none; }
+  .topnav-icon { width: 19px; height: 19px; }
+  .topnav-divider { height: 24px; }
+  .topnav-account-actions { display: none; }
+}
+
+@media (max-width: 480px) {
+  .top-header { padding-bottom: 10px !important; }
+  .top-header > div:last-child { gap: 8px !important; }
+  .top-header > div:last-child > div:last-child { padding-left: 10px !important; }
+  .top-header > div:last-child > div:last-child > div:last-child { display: none !important; }
+  .welcome-banner { margin-bottom: 14px !important; }
+}
