@@ -1,0 +1,157 @@
+/* CRANETRACK — Premium Top Navigation UI Layer
+   This file is intentionally loaded AFTER style.css.
+   It changes presentation only; dashboard.js, IDs, Supabase queries and charts remain untouched. */
+
+:root{
+  --tn-navy:#081226;
+  --tn-navy-2:#101d3a;
+  --tn-blue:#1687ff;
+  --tn-cyan:#12b8ff;
+  --tn-bg:#f5f8fc;
+  --tn-border:#dfe7f1;
+  --tn-text:#12203a;
+  --tn-muted:#6b7b91;
+}
+
+html,body{min-height:100%;}
+body{background:var(--tn-bg)!important;}
+
+/* Remove the old fixed sidebar column completely. */
+#sidebar-container{
+  position:relative!important;
+  top:auto!important; left:auto!important;
+  width:100%!important; height:auto!important;
+  min-height:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  z-index:20!important;
+  margin:0 0 26px!important;
+}
+
+.main-content{
+  position:relative!important;
+  top:auto!important; left:auto!important; right:auto!important;
+  width:100%!important; min-height:100vh!important;
+  padding:28px clamp(20px,3vw,48px) 48px!important;
+  margin:0!important;
+  background:var(--tn-bg)!important;
+  overflow:visible!important;
+}
+
+/* Keep the existing header/data markup but make it feel like a premium app bar. */
+.top-header{
+  min-height:58px;
+  margin-bottom:20px!important;
+  padding:0 2px 14px!important;
+}
+
+/* Banner: no external image dependency. */
+.welcome-banner{
+  background:
+    radial-gradient(circle at 84% 22%,rgba(31,178,255,.28),transparent 27%),
+    radial-gradient(circle at 72% 100%,rgba(79,70,229,.30),transparent 34%),
+    linear-gradient(135deg,#071126 0%,#10245a 58%,#173c8c 100%)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  min-height:190px;
+  display:flex; align-items:center;
+  box-shadow:0 18px 42px rgba(15,35,82,.16)!important;
+}
+.welcome-banner>div:first-child{opacity:.16!important; background:none!important;}
+
+/* Navigation sits immediately below the banner. */
+.top-navigation{
+  width:100%;
+  display:flex;
+  align-items:stretch;
+  gap:14px;
+  padding:12px 14px;
+  background:rgba(255,255,255,.96);
+  border:1px solid var(--tn-border);
+  border-radius:18px;
+  box-shadow:0 12px 30px rgba(25,48,85,.08);
+  backdrop-filter:blur(12px);
+}
+.topnav-brand{
+  flex:0 0 150px;
+  display:flex; align-items:center; gap:10px;
+  padding:0 12px;
+  border-right:1px solid var(--tn-border);
+  color:var(--tn-text);
+}
+.topnav-brand-mark{
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;
+  color:white;font-size:24px;font-weight:800;
+  background:linear-gradient(135deg,var(--tn-blue),var(--tn-cyan));
+  box-shadow:0 8px 18px rgba(22,135,255,.25);
+}
+.topnav-brand strong{display:block;font-size:13px;letter-spacing:.08em;line-height:1.1}
+.topnav-brand small{display:block;font-size:8px;color:var(--tn-muted);letter-spacing:.12em;margin-top:4px}
+.topnav-groups{
+  flex:1; display:flex; align-items:center; gap:7px;
+  overflow-x:auto; overflow-y:visible; scrollbar-width:none;
+}
+.topnav-groups::-webkit-scrollbar{display:none}
+.topnav-group{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+.topnav-group-label{
+  display:none;
+}
+.topnav-items{display:flex;gap:5px}
+.topnav-item{
+  position:relative; display:flex;align-items:center;gap:8px;
+  min-height:48px; padding:7px 10px;
+  border-radius:12px; text-decoration:none;
+  color:#56677f; background:transparent;
+  transition:.2s ease; white-space:nowrap;
+}
+.topnav-item:hover{background:#f1f6fc;color:var(--tn-text);transform:translateY(-1px)}
+.topnav-item.active{
+  color:#0868cf;
+  background:linear-gradient(180deg,#eef7ff,#e7f2ff);
+  box-shadow:inset 0 0 0 1px #cfe5ff,0 5px 14px rgba(22,135,255,.10);
+}
+.topnav-item.active:after{
+  content:"";position:absolute;left:18px;right:18px;bottom:-13px;height:3px;
+  border-radius:99px;background:linear-gradient(90deg,var(--tn-blue),var(--tn-cyan));
+}
+.topnav-icon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:#f3f6fa;color:#667991;flex:0 0 28px}
+.topnav-item.active .topnav-icon{background:#d9edff;color:#0878df}
+.topnav-icon svg{width:17px;height:17px}
+.topnav-copy strong{display:block;font-size:11px;line-height:1.1;font-weight:800}
+.topnav-copy small{display:block;font-size:8px;color:#8290a4;margin-top:3px}
+.topnav-logout{
+  flex:0 0 auto; align-self:center;
+  border:1px solid #e1e8f1; background:#fff; color:#65758a;
+  border-radius:11px; padding:10px 12px;
+  font-size:10px;font-weight:800;letter-spacing:.06em;
+  display:flex;align-items:center;gap:6px;cursor:pointer;
+}
+.topnav-logout:hover{background:#fff4f4;border-color:#ffd6d6;color:#d64040}
+.logout-icon{font-size:18px;line-height:1}
+.topnav-admin-slot{display:flex;flex:0 0 auto}
+
+/* Give dashboard cards more breathing room on the new full-width canvas. */
+.distribution-grid{grid-template-columns:minmax(300px,1fr) minmax(420px,2fr)!important}
+
+@media(max-width:1100px){
+  .topnav-brand{flex-basis:118px}
+  .topnav-copy small{display:none}
+  .topnav-item{padding:7px 8px}
+}
+@media(max-width:760px){
+  .main-content{padding:16px 14px 32px!important}
+  .top-header h1{font-size:1.15rem!important}
+  .welcome-banner{min-height:170px!important;padding:28px!important}
+  .welcome-banner h2{font-size:1.55rem!important}
+  .top-navigation{border-radius:15px;padding:9px;gap:8px}
+  .topnav-brand{display:none}
+  .topnav-groups{gap:3px}
+  .topnav-item{min-height:42px;padding:6px 8px}
+  .topnav-copy strong{font-size:10px}
+  .topnav-icon{width:25px;height:25px;flex-basis:25px}
+  .topnav-icon svg{width:15px;height:15px}
+  .topnav-item.active:after{bottom:-10px}
+  .topnav-logout span:last-child{display:none}
+  .topnav-logout{padding:9px 10px}
+  .distribution-grid{grid-template-columns:1fr!important}
+}
