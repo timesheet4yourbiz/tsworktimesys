@@ -1,107 +1,72 @@
 import { supabase } from './supabase.js';
 
-const icon = (name) => {
-    const icons = {
-        dashboard: '<rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect>',
-        tracker: '<circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 16 14"></polyline>',
-        timesheet: '<rect x="4" y="3" width="16" height="18" rx="2"></rect><line x1="8" y1="8" x2="16" y2="8"></line><line x1="8" y1="12" x2="16" y2="12"></line><line x1="8" y1="16" x2="13" y2="16"></line>',
-        reports: '<line x1="5" y1="20" x2="5" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="19" y1="20" x2="19" y2="7"></line>',
-        projects: '<path d="M3 7h6l2 2h10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M3 7V5a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v2"></path>',
-        tasks: '<rect x="4" y="3" width="16" height="18" rx="2"></rect><polyline points="8 9 10 11 14 7"></polyline><line x1="8" y1="15" x2="16" y2="15"></line>',
-        tags: '<path d="M20 13l-7 7-10-10V3h7z"></path><circle cx="7.5" cy="7.5" r="1.2"></circle>',
-        clients: '<rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>',
-        team: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
-        attendance: '<circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 16 14"></polyline>',
-        approvals: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polyline points="9 15 11 17 15 13"></polyline>',
-        profile: '<circle cx="12" cy="7" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path>',
-        settings: '<circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.1 2.1-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.1h-3v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-2.1-2.1.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3v-3h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 2.1-2.1.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3h3v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 2.1 2.1-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1v3h-.1a1.7 1.7 0 0 0-1.6 1z"></path>'
-    };
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || ''}</svg>`;
-};
-
-const menu = [
-    ['TIME TRACKING', [
-        ['dashboard.html','Dashboard','Overview & Insights','dashboard'],
-        ['tracker.html','Time Tracker','Start / Stop Timer','tracker'],
-        ['timesheet.html','Timesheet','View & Edit Logs','timesheet'],
-        ['reports.html','Reports','Analytics & Export','reports']
-    ]],
-    ['WORK MANAGEMENT', [
-        ['projects.html','Projects','Manage Projects','projects'],
-        ['tasks.html','Tasks','Task List & Progress','tasks'],
-        ['tags.html','Tags','Organize Work','tags'],
-        ['clients.html','Clients','Client Management','clients']
-    ]],
-    ['WORKFORCE', [
-        ['attendance.html','Attendance','Team Attendance','attendance'],
-        ['approvals.html','Approvals','Request Approvals','approvals']
-    ]],
-    ['ACCOUNT', [
-        ['profile.html','My Profile','Profile & Preferences','profile'],
-        ['settings.html','Settings','System Settings','settings']
-    ]]
-];
-
 export async function loadSidebar() {
     const container = document.getElementById('sidebar-container');
     if (!container) return;
     const currentPath = window.location.pathname;
 
-    const groupHtml = menu.map(([label, items]) => `
-        <div class="topnav-group">
-            <span class="topnav-group-label">${label}</span>
-            <div class="topnav-items">
-                ${items.map(([href,title,subtitle,ico]) => `
-                    <a href="${href}" class="topnav-item ${currentPath.includes(href) ? 'active' : ''}" title="${title}">
-                        <span class="topnav-icon">${icon(ico)}</span>
-                        <span class="topnav-copy"><strong>${title}</strong><small>${subtitle}</small></span>
-                    </a>`).join('')}
-            </div>
-        </div>`).join('');
+    const icon = (name) => {
+        const icons = {
+            home:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+            clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+            sheet:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+            calendar:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/>',
+            folder:'<path d="M3 6a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+            tasks:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="m8 9 1.5 1.5L12 8M8 15h8"/>',
+            tag:'<path d="M20 13.5 13.5 20a2 2 0 0 1-2.8 0L4 13.3V4h9.3l6.7 6.7a2 2 0 0 1 0 2.8z"/><circle cx="8" cy="8" r="1"/>',
+            brief:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/>',
+            users:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M17 11a3 3 0 1 0-1-5M16 14a5 5 0 0 1 5 6"/>',
+            chart:'<path d="M5 20V10M12 20V4M19 20v-7"/>',
+            gear:'<circle cx="12" cy="12" r="3"/><path d="M19 15a1.7 1.7 0 0 0 .3 1.8l.1.1-2.1 2.1-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21h-3v-.9a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1-2.1-2.1.1-.1A1.7 1.7 0 0 0 5 15a1.7 1.7 0 0 0-1.5-1H2v-3h1.5A1.7 1.7 0 0 0 5 10a1.7 1.7 0 0 0-.3-1.8l-.1-.1 2.1-2.1.1.1A1.7 1.7 0 0 0 8.6 6a1.7 1.7 0 0 0 1-1.5V3h3v1.5a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1 2.1 2.1-.1.1A1.7 1.7 0 0 0 17 10a1.7 1.7 0 0 0 1.5 1H20v3h-.9a1.7 1.7 0 0 0-1.1 1z"/>',
+        };
+        return `<svg viewBox="0 0 24 24" aria-hidden="true">${icons[name] || icons.home}</svg>`;
+    };
+
+    const items = [
+        ['dashboard.html','Dashboard','home'],['tracker.html','Time Tracking','clock'],['timesheet.html','Timesheet','sheet'],['calendar.html','Calendar','calendar'],['projects.html','Projects','folder'],['tasks.html','Tasks','tasks'],['clients.html','Clients','brief'],['reports.html','Reports','chart']
+    ];
 
     container.innerHTML = `
-        <nav class="top-navigation" aria-label="Primary navigation">
-            <div class="topnav-brand">
-                <span class="topnav-brand-mark">⌁</span>
-                <span><strong>WORKTIME</strong><small>TIME MANAGEMENT</small></span>
-            </div>
-            <div class="topnav-groups">${groupHtml}
-                <div id="adminEmployeesMenuItem" class="topnav-admin-slot"></div>
-            </div>
-            <button id="logoutBtn" class="topnav-logout" type="button" title="Logout">
-                <span class="logout-icon">↪</span><span>Logout</span>
-            </button>
-        </nav>`;
+      <nav class="ct-main-nav">
+        <a class="ct-brand" href="dashboard.html"><span class="ct-brand-mark"><i></i><i></i><i></i></span><span><b>CRANETRACK</b><small>TIME | PROJECT | TEAM</small></span></a>
+        <div class="ct-nav-links">
+          ${items.map(([href,label,ico]) => `<a href="${href}" class="ct-nav-link ${currentPath.includes(href) ? 'active' : ''}">${icon(ico)}<span>${label}</span></a>`).join('')}
+          <div id="adminEmployeesMenuItem"></div>
+        </div>
+        <div class="ct-nav-more">
+          <a href="settings.html" class="ct-nav-link ${currentPath.includes('settings.html') ? 'active' : ''}">${icon('gear')}<span>Settings</span></a>
+        </div>
+      </nav>`;
 
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            window.location.href = '../pages/login.html';
-        });
-    }
-
+    // Add Team / Employees only for Admin, preserving the original role logic.
     try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
-        const { data: emp } = await supabase.from('employees').select('name, system_role').eq('email', session.user.email).maybeSingle();
+        const email = session.user.email;
+        const { data: emp } = await supabase.from('employees').select('name, system_role').eq('email', email).maybeSingle();
         const roleText = (emp && emp.system_role) ? emp.system_role.toLowerCase() : 'employee';
-        if (roleText === 'admin') {
-            const slot = document.getElementById('adminEmployeesMenuItem');
-            if (slot) {
-                slot.innerHTML = `
-                    <div class="topnav-group topnav-admin-group">
-                        <span class="topnav-group-label">ADMIN</span>
-                        <div class="topnav-items">
-                            <a href="employees.html" class="topnav-item ${currentPath.includes('employees.html') ? 'active' : ''}" title="Team / Employees">
-                                <span class="topnav-icon">${icon('team')}</span>
-                                <span class="topnav-copy"><strong>Team</strong><small>Employees & Roles</small></span>
-                            </a>
-                        </div>
-                    </div>`;
-            }
+        const isAdmin = roleText === 'admin';
+        window.currentUserIsAdmin = isAdmin;
+        if (emp?.name) {
+            const name = emp.name.trim();
+            const first = name.split(/\s+/)[0];
+            document.getElementById('headerUserName')?.replaceChildren(document.createTextNode(name.toUpperCase()));
+            document.getElementById('welcomeUserName')?.replaceChildren(document.createTextNode(first));
+            document.getElementById('headerAvatar')?.replaceChildren(document.createTextNode(first.charAt(0).toUpperCase()));
         }
-    } catch (error) {
-        console.warn('Top navigation role check failed:', error);
-    }
-}
+        const roleEl = document.getElementById('headerUserRole');
+        if (roleEl) roleEl.textContent = roleText === 'admin' ? 'Administrator' : 'Team Member';
+        if (isAdmin) {
+            const holder = document.getElementById('adminEmployeesMenuItem');
+            if (holder) holder.innerHTML = `<a href="employees.html" class="ct-nav-link ${currentPath.includes('employees.html') ? 'active' : ''}">${icon('users')}<span>Team</span></a>`;
+        }
+    } catch (err) { console.error('Top navigation auth check:', err); }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn?.addEventListener('click', async () => { await supabase.auth.signOut(); window.location.href = '../pages/login.html'; });
+
+    const profileBtn = document.getElementById('profileMenuBtn');
+    const profileDrop = document.getElementById('profileDropdown');
+    profileBtn?.addEventListener('click', (e) => { e.stopPropagation(); const open = profileDrop.style.display !== 'none'; profileDrop.style.display = open ? 'none' : 'block'; profileBtn.setAttribute('aria-expanded', String(!open)); });
+    document.addEventListener('click', () => { if (profileDrop) profileDrop.style.display = 'none'; });
+};
