@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRANETRACK — Branding & Appearance</title>
+<link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="../css/cranetrack_dashboard.css">
+<style>
+:root{--brand-primary:#1d4ed8;--brand-accent:#0ea5e9;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--soft:#f8fafc}
+body{background:#f4f7fb}.main-content{padding:28px}.brand-page{max-width:1250px;margin:auto}.brand-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px}.brand-head h1{margin:0;font-size:28px;color:var(--ink)}.brand-head p{margin:6px 0 0;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 24px rgba(15,23,42,.05);padding:22px;margin-bottom:18px}.card h2{font-size:17px;margin:0 0 4px;color:var(--ink)}.card .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#475569}.field input,.field textarea{border:1px solid #cbd5e1;border-radius:10px;padding:11px 13px;font:inherit;outline:none}.field input:focus,.field textarea:focus{border-color:var(--brand-accent);box-shadow:0 0 0 3px rgba(14,165,233,.10)}
+.asset{border:1px dashed #cbd5e1;border-radius:14px;padding:14px;background:#fbfdff}.asset-row{display:flex;gap:16px;align-items:center}.preview{width:120px;height:64px;border-radius:10px;background:#eef4fb;object-fit:cover;border:1px solid #e2e8f0}.preview.square{width:72px;height:72px;object-fit:contain}.asset input[type=file]{font-size:12px}.hint{font-size:12px;color:#94a3b8;margin-top:5px}
+.colors{display:flex;gap:14px;align-items:center}.colorbox{display:flex;align-items:center;gap:9px;border:1px solid var(--line);padding:10px;border-radius:10px}.colorbox input{width:42px;height:32px;padding:0;border:0;background:none}.actions{display:flex;justify-content:flex-end;gap:10px}.btn{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer}.btn.primary{background:var(--brand-primary);border-color:var(--brand-primary);color:#fff}.status{font-size:13px;color:#64748b;align-self:center}.danger{color:#b91c1c}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.main-content{padding:16px}.brand-head{display:block}.actions{justify-content:stretch}.actions .btn{flex:1}}
+</style>
+</head>
+<body>
+<div id="sidebar-container"></div>
+<main class="main-content cranetrack-page"><div class="brand-page">
+<header class="brand-head"><div><h1>Branding & Appearance</h1><p>Manage the visual identity of CRANETRACK without editing HTML or CSS.</p></div><span id="status" class="status"></span></header>
+<section class="card"><h2>System Identity</h2><div class="sub">Names and messages displayed throughout the application.</div><div class="grid">
+<div class="field"><label>System Name</label><input id="system_name" value="CRANETRACK"></div>
+<div class="field"><label>System Tagline</label><input id="system_tagline" value="TIME | PROJECT | TEAM"></div>
+<div class="field"><label>Welcome Heading</label><input id="welcome_title" value="Good Afternoon,"></div>
+<div class="field"><label>Welcome Message</label><input id="welcome_message" value="Track time. Deliver projects. Build a better tomorrow."></div>
+</div></section>
+<section class="card"><h2>Brand Assets</h2><div class="sub">Files are stored in the existing <b>cranetrack-assets</b> Supabase Storage bucket.</div>
+<div class="grid">
+<div class="asset"><label class="field"><b>Logo</b><input type="file" id="logo_file" accept="image/png,image/jpeg,image/svg+xml"><span class="hint">PNG/JPG/SVG recommended.</span></label><div class="asset-row"><img id="logo_preview" class="preview square" alt="Logo preview"><span id="logo_url_text" class="hint">No logo uploaded.</span></div></div>
+<div class="asset"><label class="field"><b>Favicon</b><input type="file" id="favicon_file" accept="image/png,image/x-icon,image/svg+xml"><span class="hint">Use a square 32×32 or 64×64 image.</span></label><div class="asset-row"><img id="favicon_preview" class="preview square" alt="Favicon preview"><span id="favicon_url_text" class="hint">No favicon uploaded.</span></div></div>
+<div class="asset"><label class="field"><b>Dashboard Banner</b><input type="file" id="banner_file" accept="image/png,image/jpeg,image/webp"><span class="hint">Recommended wide image: 1600×360 or larger.</span></label><div class="asset-row"><img id="banner_preview" class="preview" style="width:180px" alt="Banner preview"><span id="banner_url_text" class="hint">Using current banner.</span></div></div>
+<div class="asset"><label class="field"><b>Login Background</b><input type="file" id="login_file" accept="image/png,image/jpeg,image/webp"><span class="hint">Optional background for the login page.</span></label><div class="asset-row"><img id="login_preview" class="preview" style="width:180px" alt="Login preview"><span id="login_url_text" class="hint">Optional.</span></div></div>
+</div></section>
+<section class="card"><h2>Theme Colors</h2><div class="sub">Set the primary and accent colors used by the branding layer.</div><div class="colors"><div class="colorbox"><b>Primary</b><input type="color" id="primary_color" value="#1d4ed8"><code id="primary_hex">#1D4ED8</code></div><div class="colorbox"><b>Accent</b><input type="color" id="accent_color" value="#0ea5e9"><code id="accent_hex">#0EA5E9</code></div></div></section>
+<section class="card"><div class="actions"><span id="saveStatus" class="status"></span><button class="btn" id="resetBtn">Reset</button><button class="btn primary" id="saveBtn">Save Branding</button></div></section>
+</div></main>
+<script type="module" src="../js/branding_settings.js"></script>
+</body></html>
