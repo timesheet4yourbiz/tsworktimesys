@@ -205,7 +205,7 @@ function processKPI(entries) {
     for (const [k, v] of Object.entries(projMap)) { if (v > maxP) { maxP = v; topP = k; } }
 
     document.getElementById('kpiTotalTime').textContent = formatHMS(totalSec);
-    document.getElementById('kpiTopProject').textContent = topP;
+  
     const donutTotal = document.getElementById('donutTotal');
     if (donutTotal) donutTotal.textContent = formatHMS(totalSec);
 }
