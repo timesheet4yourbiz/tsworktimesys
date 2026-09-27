@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRANETRACK — Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/cranetrack_dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style id="cranetrack-v4-1-banner-fix">
+        :root { --ct-banner-image: url("https://gevftxdqyrejnjovurjt.supabase.co/storage/v1/object/public/cranetrack-assets/dashboard/crane-banner.jpg"); }
+        .ct-welcome {
+            min-height: 142px !important;
+            height: 142px !important;
+            position: relative !important;
+            overflow: hidden !important;
+            border-radius: 10px !important;
+            background-image:
+                linear-gradient(90deg, rgba(231,243,255,.84) 0%, rgba(205,229,251,.48) 38%, rgba(36,83,145,.16) 68%, rgba(5,31,71,.58) 100%),
+                var(--ct-banner-image) !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            box-shadow: 0 10px 26px rgba(24,65,116,.12) !important;
+        }
+        .ct-welcome::before, .ct-welcome::after { display:none !important; content:none !important; }
+        .ct-welcome-overlay { display:none !important; }
+        .ct-welcome-content, .ct-welcome-right { position:relative !important; z-index:2 !important; }
+        .ct-welcome-content { max-width: 62% !important; }
+        .ct-welcome-right { text-shadow: 0 1px 8px rgba(0,0,0,.25); }
+        @media (max-width: 900px) {
+            .ct-welcome { height: 150px !important; min-height:150px !important; }
+            .ct-welcome-content { max-width: 78% !important; }
+        }
+        @media (max-width: 640px) {
+            .ct-welcome { height: 180px !important; min-height:180px !important; background-position: 58% center !important; }
+            .ct-welcome-content { max-width: 100% !important; }
+            .ct-welcome-right { display:none !important; }
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Required by dashboard.js: the navigation is rendered here, but is no longer a sidebar. -->
+    <div id="sidebar-container"></div>
+
+    <main class="main-content cranetrack-page">
+        <header class="ct-topbar">
+            <div class="ct-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                <input id="globalSearch" type="search" placeholder="Search project, member, client, or task..." aria-label="Search">
+            </div>
+
+            <div class="ct-top-actions">
+                <div class="ct-date-pill">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+                    <button id="prevDashBtn" class="ct-date-arrow" aria-label="Previous week">‹</button>
+                    <span id="dashDateRangeText">Loading...</span>
+                    <button id="nextDashBtn" class="ct-date-arrow" aria-label="Next week">›</button>
+                </div>
+
+                <div class="ct-notification-wrap">
+                    <button id="notifBellBtn" class="ct-icon-btn" aria-label="Notifications">
+                        <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        <span id="notifBadge" class="ct-notif-badge" style="display:none">0</span>
+                    </button>
+                    <div id="notifDropdown" class="ct-notif-dropdown" style="display:none">
+                        <div class="ct-notif-head"><strong>Notifications</strong><button id="markAllReadBtn">Mark all read</button></div>
+                        <div id="notifList"><div class="ct-empty">Loading notifications...</div></div>
+                    </div>
+                </div>
+
+                <div class="ct-profile-wrap">
+                    <button id="profileMenuBtn" class="ct-profile-btn" aria-expanded="false">
+                        <span class="ct-avatar" id="headerAvatar">M</span>
+                        <span class="ct-profile-copy"><strong id="headerUserName">MOHAMAD</strong><small id="headerUserRole">Administrator</small></span>
+                        <svg class="ct-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
+                    </button>
+                    <div id="profileDropdown" class="ct-profile-dropdown" style="display:none">
+                        <a href="profile.html">My Profile</a>
+                        <a href="settings.html">Settings</a>
+                        <button id="logoutBtn">Log out</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="ct-welcome">
+            <div class="ct-welcome-overlay"></div>
+            <div class="ct-welcome-content">
+                <div class="ct-eyebrow">WELCOME BACK</div>
+                <h1>Good Afternoon, <span id="welcomeUserName">Mohamad</span></h1>
+                <p>Track time. Deliver projects. Build a better tomorrow.</p>
+                <span class="ct-accent-line"></span>
+            </div>
+            <div class="ct-welcome-right">
+                <div>PLAN</div><div>EXECUTE</div><div>MONITOR</div><div>ACHIEVE</div>
+                <span></span>
+            </div>
+        </section>
+
+        <section class="ct-kpi-grid">
+            <article class="ct-kpi-card kpi-purple">
+                <div class="ct-kpi-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></div>
+                <div class="ct-kpi-body"><small>TOTAL HOURS</small><strong id="kpiTotalTime">--:--</strong><span class="ct-kpi-trend positive">↗ +12%</span><em>vs. previous week</em></div>
+                <div class="ct-mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+            <article class="ct-kpi-card kpi-teal">
+                <div class="ct-kpi-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M8 8h8M8 12h5M8 16h6"></path></svg></div>
+                <div class="ct-kpi-body"><small>ACTIVE PROJECTS</small><strong id="kpiActiveProjects">--</strong><span class="ct-kpi-trend neutral">↗ +3</span><em>vs. previous week</em></div>
+                <div class="ct-mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+            <article class="ct-kpi-card kpi-orange">
+                <div class="ct-kpi-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.5"></circle><path d="M3 20a6 6 0 0 1 12 0M14 20a5 5 0 0 1 7 0"></path></svg></div>
+                <div class="ct-kpi-body"><small>TEAM MEMBERS</small><strong id="kpiTeamMembers">--</strong><span class="ct-kpi-trend neutral">↔ 0%</span><em>vs. previous week</em></div>
+                <div class="ct-mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+            <article class="ct-kpi-card kpi-pink">
+                <div class="ct-kpi-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16v14H4z"></path><path d="M8 6V4h8v2M8 11h8M8 15h5"></path></svg></div>
+                <div class="ct-kpi-body"><small>TOP PROJECT</small><strong id="kpiTopClient">--</strong><span class="ct-kpi-trend red">24.8%</span><em>of total hours</em></div>
+                <div class="ct-mini-bars"><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+        </section>
+
+        <section class="ct-filterbar">
+            <div class="ct-filter-control"><svg viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"></path></svg><select id="filterProject"><option value="all">All Projects</option></select></div>
+            <div class="ct-filter-control"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><path d="M3 20a6 6 0 0 1 12 0M16 11a3 3 0 1 0 0-6M16 14a5 5 0 0 1 5 6"></path></svg><select id="filterTeam"><option value="all">All Teams</option></select></div>
+            <div class="ct-filter-spacer"></div>
+            <button class="ct-apply-filter" id="applyDashboardFilter"><svg viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"></path></svg> Apply Filter</button>
+        </section>
+
+        <section class="ct-grid-primary">
+            <article class="ct-panel ct-time-panel">
+                <div class="ct-panel-head"><div><div class="ct-panel-title"><span class="ct-title-icon blue"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"></path></svg></span><h2>Tracked Time by Day</h2></div><p>Total hours tracked across all projects and team members</p></div><div class="ct-chart-actions"><select><option>Stacked</option></select><select><option>Hours</option></select><button>•••</button></div></div>
+                <div class="ct-chart-box ct-bar-box"><canvas id="stackedBarChart"></canvas></div>
+            </article>
+            <article class="ct-panel ct-project-distribution">
+                <div class="ct-panel-head"><div class="ct-panel-title"><span class="ct-title-icon green"><svg viewBox="0 0 24 24"><path d="M5 19V9M12 19V4M19 19v-7"></path></svg></span><h2>Project Distribution</h2></div><button>•••</button></div>
+                <div class="ct-donut-wrap"><div class="ct-donut-box"><canvas id="donutChart"></canvas><div class="ct-donut-center"><strong id="donutTotal">--:--</strong><span>Total Hours</span></div></div><div id="projectDistributionLegend" class="ct-legend"></div></div>
+            </article>
+        </section>
+
+        <section class="ct-grid-secondary">
+            <article class="ct-panel ct-list-panel"><div class="ct-panel-head"><div class="ct-panel-title"><span class="ct-title-icon gold">🏆</span><h2>Top Projects</h2></div><a href="projects.html">View All →</a></div><div id="topProjectsList" class="ct-top-projects"><div class="ct-empty">Loading...</div></div></article>
+            <article class="ct-panel ct-list-panel"><div class="ct-panel-head"><div class="ct-panel-title"><span class="ct-title-icon green"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"></path></svg></span><h2>Team Performance</h2></div><a href="employees.html">View All →</a></div><div id="teamPerformanceList" class="ct-team-performance"><div class="ct-empty">Loading...</div></div></article>
+            <article class="ct-panel ct-list-panel"><div class="ct-panel-head"><div class="ct-panel-title"><span class="ct-title-icon blue">⚙</span><h2>Project Status</h2></div><button>•••</button></div><div class="ct-status-wrap"><div class="ct-status-donut"><canvas id="projectStatusChart"></canvas><div><strong id="projectStatusTotal">--</strong><span>Total Projects</span></div></div><div id="projectStatusLegend" class="ct-status-legend"></div></div></article>
+        </section>
+
+        <section class="ct-team-panel">
+            <div class="ct-team-head">
+                <div class="ct-panel-title"><span class="ct-title-icon blue"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.5"></circle><path d="M2 20a6 6 0 0 1 12 0M14 20a5 5 0 0 1 8 0"></path></svg></span><div><h2>Recent Team Activities</h2><p>Live and historical activity of your team members</p></div></div>
+                <div class="ct-team-tools"><label class="ct-search-small"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="searchMemberInput" placeholder="Search member..."></label><select><option>All Status</option></select><select><option>All Projects</option></select><div class="ct-view-toggle"><button class="active">☷</button><button>▥</button><button>▦</button></div></div>
+            </div>
+            <div class="table-container ct-table-wrap">
+                <table class="team-table ct-team-table">
+                    <thead><tr><th>#</th><th>TEAM MEMBER</th><th>LATEST ACTIVITY</th><th>PROJECT</th><th>TIME</th><th>STATUS</th><th>DATE & TIME</th><th>ACTIONS</th></tr></thead>
+                    <tbody id="teamActivitiesBody"><tr><td colspan="8" class="ct-empty">Loading team activity...</td></tr></tbody>
+                </table>
+            </div>
+            <div class="ct-pagination"><div>Show <select id="recordsPerPage"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select> entries</div><div class="ct-page-buttons"><button id="btnPrev">‹</button><button id="currentPageDisplay">1</button><button id="btnNext">›</button></div></div>
+        </section>
+
+        <input type="hidden" id="userEmail" value="">
+    </main>
+    <script type="module" src="../js/dashboard.js?v=4.1.0"></script>
+</body>
+</html>
